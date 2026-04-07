@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GLITCH TAG • PEAK v4</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button id="sound-btn">🔊 SFX</button>
+
+    <!-- SVG Filters for colorblind modes -->
+    <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="deuteranopia-filter"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"/></filter>
+            <filter id="protanopia-filter"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"/></filter>
+            <filter id="tritanopia-filter"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"/></filter>
+        </defs>
+    </svg>
+
+    <div class="logo-wrap">
+        <h1 id="main-title">
+            <span>G</span><span>L</span><span>I</span><span>T</span><span>C</span><span>H</span>
+            <span>&nbsp;</span>
+            <span>T</span><span>A</span><span>G</span>
+        </h1>
+    </div>
+    <p class="tagline">// v4.0 — ULTIMATE EDITION — UP TO 8 PLAYERS</p>
+
+    <!-- LOBBY SCREEN -->
+    <div id="lobby-screen" class="screen active">
+        <div class="player-slots" id="player-slots"></div>
+
+        <!-- Session Leaderboard -->
+        <div id="leaderboard-section" style="display:none;">
+            <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+                <div class="card-title">// SESSION LEADERBOARD</div>
+                <div id="lb-rows"></div>
+            </div>
+        </div>
+
+        <div class="lobby-grid">
+            <div class="card">
+                <div class="card-title">// ADD LOCAL PLAYER</div>
+                <label>NAME</label>
+                <input type="text" id="player-name-input" maxlength="9" placeholder="ENTER NAME">
+                <label>CONTROLS</label>
+                <select id="control-scheme">
+                    <option value="wasd">WASD — Player 1</option>
+                    <option value="arrows">ARROWS — Player 2</option>
+                    <option value="ijkl">IJKL — Player 3</option>
+                    <option value="numpad">NUMPAD — Player 4</option>
+                </select>
+                <button class="btn btn-accent" id="add-local-btn">+ ADD PLAYER</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">// ADD AI BOT</div>
+                <label>DIFFICULTY</label>
+                <select id="ai-difficulty">
+                    <option value="easy">EASY</option>
+                    <option value="medium" selected>MEDIUM</option>
+                    <option value="hard">HARD</option>
+                    <option value="nightmare">NIGHTMARE</option>
+                </select>
+                <button class="btn btn-accent" id="add-ai-btn">🤖 ADD BOT</button>
+                <div id="ai-count" style="font-size:0.58rem; color:var(--muted); margin-top:0.3rem;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">// NETWORK</div>
+                <label>ROOM CODE</label>
+                <div class="room-code" id="room-code-display">——————</div>
+                <button class="btn btn-accent" id="gen-room-btn">HOST ROOM</button>
+                <div style="border-top:1px solid var(--border); padding-top:0.55rem;">
+                    <label>JOIN ROOM</label>
+                    <div class="inline-row" style="margin-top:0.3rem;">
+                        <input type="text" id="join-code-input" maxlength="6" placeholder="A1B2C3" style="letter-spacing:0.3em; text-transform:uppercase;">
+                        <button class="btn btn-warn" id="join-room-btn">JOIN</button>
+                    </div>
+                </div>
+                <div id="net-status" style="font-size:0.58rem; color:var(--muted); min-height:14px;"></div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// GAME SETTINGS</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.4rem;">
+                <div>
+                    <label>GAME MODE</label>
+                    <select id="game-mode">
+                        <option value="classic">Classic Tag</option>
+                        <option value="hunted">Hunted</option>
+                        <option value="potato">Hot Potato</option>
+                        <option value="assassin">Assassin</option>
+                        <option value="blitz">Blitz</option>
+                        <option value="king">King</option>
+                        <option value="drainrace">Drain Race</option>
+                    </select>
+                </div>
+                <div>
+                    <label>ARENA THEME</label>
+                    <select id="arena-theme">
+                        <option value="">Void</option>
+                        <option value="theme-neon">Neon City</option>
+                        <option value="theme-inferno">Inferno</option>
+                        <option value="theme-ice">Ice Lab</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem;">
+                <div>
+                    <label>DURATION</label>
+                    <select id="round-duration">
+                        <option value="60">1 min</option>
+                        <option value="120" selected>2 min</option>
+                        <option value="180">3 min</option>
+                        <option value="300">5 min</option>
+                    </select>
+                </div>
+                <div>
+                    <label>GLITCH RATE</label>
+                    <select id="glitch-intensity">
+                        <option value="low">LOW</option>
+                        <option value="medium" selected>MEDIUM</option>
+                        <option value="high">HIGH</option>
+                        <option value="insane">INSANE</option>
+                    </select>
+                </div>
+                <div>
+                    <label>POWERUPS</label>
+                    <select id="powerup-setting">
+                        <option value="on" selected>ON</option>
+                        <option value="off">OFF</option>
+                    </select>
+                </div>
+            </div>
+            <div id="mode-desc" style="font-size:0.6rem; color:var(--muted); padding:0.3rem 0; border-top:1px solid var(--border); margin-top:0.2rem;"></div>
+        </div>
+
+        <!-- Graphics & Accessibility Settings -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// GRAPHICS & ACCESSIBILITY</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.4rem;">
+                <div>
+                    <label>VISUAL EFFECTS</label>
+                    <select id="graphics-preset">
+                        <option value="normal" selected>NORMAL</option>
+                        <option value="crt">CRT FILTER</option>
+                        <option value="high-contrast">HIGH CONTRAST</option>
+                        <option value="reduced-motion">REDUCED MOTION</option>
+                    </select>
+                </div>
+                <div>
+                    <label>COLORBLIND MODE</label>
+                    <select id="colorblind-mode">
+                        <option value="none" selected>OFF</option>
+                        <option value="deuteranopia">DEUTERANOPIA</option>
+                        <option value="protanopia">PROTANOPIA</option>
+                        <option value="tritanopia">TRITANOPIA</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// ACHIEVEMENTS <span id="achievement-count" style="font-size:0.65rem;">(0/12)</span></div>
+            <div id="achievement-display" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(45px, 1fr)); gap:0.35rem;"></div>
+        </div>
+
+        <!-- Player Profile & Meta Progression -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// PLAYER PROFILE <span id="profile-rank-badge" style="font-size:0.65rem; color:var(--accent);">LV.1 ROOKIE</span></div>
+            <div style="display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap;">
+                <div style="flex:1; min-width:120px;">
+                    <div style="font-size:0.58rem; color:var(--muted); margin-bottom:2px;">XP PROGRESS</div>
+                    <div id="xp-bar-bg" style="height:6px; background:var(--border); border-radius:3px; overflow:hidden;">
+                        <div id="xp-bar" style="height:100%; width:0%; background:var(--accent); transition:width 0.5s; border-radius:3px;"></div>
+                    </div>
+                    <div id="xp-label" style="font-size:0.52rem; color:var(--muted); margin-top:2px;">0 / 500 XP</div>
+                </div>
+                <div style="display:flex; gap:0.6rem; font-size:0.6rem; flex-wrap:wrap;">
+                    <span>🏹 <span id="stat-total-tags">0</span> tags</span>
+                    <span>🏆 <span id="stat-wins">0</span> wins</span>
+                    <span>🎮 <span id="stat-rounds">0</span> rounds</span>
+                    <span>💰 <span id="stat-coins">0</span> coins</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skins & Unlockables -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// SKINS & UNLOCKABLES <span id="skin-coins-display" style="font-size:0.65rem; color:var(--warn);">💰 0 GLITCH COINS</span></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.4rem;">
+                <div>
+                    <label>TRAIL STYLE</label>
+                    <select id="trail-select">
+                        <option value="default">Default</option>
+                        <option value="rainbow" data-cost="200">🌈 Rainbow (200🪙)</option>
+                        <option value="neon" data-cost="150">💡 Neon (150🪙)</option>
+                        <option value="smoke" data-cost="100">💨 Smoke (100🪙)</option>
+                        <option value="electric" data-cost="300">⚡ Electric (300🪙)</option>
+                        <option value="fire" data-cost="250">🔥 Fire (250🪙)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>DEATH ANIMATION</label>
+                    <select id="death-anim-select">
+                        <option value="default">Default</option>
+                        <option value="explosion" data-cost="100">💥 Explosion (100🪙)</option>
+                        <option value="glitch" data-cost="150">🔲 Glitch-Out (150🪙)</option>
+                        <option value="confetti" data-cost="200">🎊 Confetti (200🪙)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="unlock-shop-msg" style="font-size:0.58rem; color:var(--muted);"></div>
+            <button class="btn btn-warn" id="unlock-btn" style="font-size:0.65rem; margin-top:0.2rem;">🔓 UNLOCK SELECTED</button>
+        </div>
+
+        <!-- Daily Challenges -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// DAILY CHALLENGES <span id="challenges-completed" style="font-size:0.65rem;">(0/3)</span></div>
+            <div id="daily-challenges-display" style="display:flex; flex-direction:column; gap:0.35rem;"></div>
+        </div>
+
+        <!-- Tournament Mode -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// TOURNAMENT MODE</div>
+            <div style="font-size:0.6rem; color:var(--muted); margin-bottom:0.4rem;">8-player bracket · Best of 3 · Bragging rights</div>
+            <div id="tournament-bracket" style="display:none; margin-bottom:0.4rem;"></div>
+            <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-purp" id="tournament-start-btn" style="font-size:0.65rem; flex:1;">🏆 START TOURNAMENT</button>
+                <button class="btn btn-muted" id="tournament-reset-btn" style="font-size:0.65rem; flex:1; display:none;">RESET</button>
+            </div>
+        </div>
+
+        <!-- Map Editor -->
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.8rem;">
+            <div class="card-title">// MAP EDITOR</div>
+            <div style="font-size:0.6rem; color:var(--muted); margin-bottom:0.4rem;">Create and save custom arena layouts</div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-accent" id="map-editor-btn" style="font-size:0.65rem; flex:1;">🗺️ OPEN EDITOR</button>
+                <button class="btn btn-muted" id="map-load-btn" style="font-size:0.65rem; flex:1;">📂 LOAD MAP</button>
+                <button class="btn btn-danger" id="map-clear-btn" style="font-size:0.65rem; flex:1;">🗑️ CLEAR</button>
+            </div>
+            <div id="map-slot-list" style="font-size:0.58rem; color:var(--muted); min-height:14px; margin-top:0.3rem;"></div>
+        </div>
+
+        <!-- Tutorial Button -->
+        <button class="btn btn-info" id="tutorial-btn" style="width:660px; max-width:100%; margin-bottom:0.8rem; font-size:0.68rem;">📖 TUTORIAL — HOW TO PLAY</button>
+        <div class="card" style="max-width:660px; width:100%; margin-bottom:0.9rem; font-size:0.62rem; gap:0.5rem;">
+            <div class="card-title">// CONTROLS & POWERUPS</div>
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; line-height:1.9;">
+                <span>P1: <span style="color:var(--warn)">WASD</span></span>
+                <span>P2: <span style="color:var(--warn)">ARROWS</span></span>
+                <span>P3: <span style="color:var(--warn)">IJKL</span></span>
+                <span>P4: <span style="color:var(--warn)">NUMPAD 8456</span></span>
+            </div>
+            <div style="display:flex; gap:0.8rem; flex-wrap:wrap; line-height:2; border-top:1px solid var(--border); padding-top:0.4rem;">
+                <span>🛡️ Shield</span><span style="color:var(--muted)">immune to tags & drains</span>
+                <span>❄️ Freeze</span><span style="color:var(--muted)">stops + pauses enemy HP</span>
+                <span>👻 Ghost</span><span style="color:var(--muted)">untaggable + phase walls</span>
+                <span>💣 Bomb</span><span style="color:var(--muted)">-30hp all nearby</span>
+                <span>🔀 Swap</span><span style="color:var(--muted)">teleport swap nearest foe</span>
+                <span>🩸 Leech</span><span style="color:var(--muted)">drain 6hp/s from nearest</span>
+                <span>🪄 Decoy</span><span style="color:var(--muted)">clone absorbs 1 tag</span>
+                <span>💊 HP Pack</span><span style="color:var(--muted)">+40hp instantly</span>
+                <span>⚡ Speed</span><span style="color:var(--muted)">1.6× faster for 4s</span>
+                <span>🔋 Overclock</span><span style="color:var(--muted)">2× HP gain for 6s</span>
+            </div>
+        </div>
+
+        <button class="btn btn-accent" id="start-btn" disabled style="font-family:'Orbitron',sans-serif; font-size:0.9rem; letter-spacing:0.2em; padding:0.65rem 2.2rem; margin-bottom:0.4rem;">START GAME</button>
+        <div id="lobby-msg" style="font-size:0.62rem; color:var(--muted);">Need at least 2 players</div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="screen">
+        <div class="game-hud">
+            <div class="hud-left">
+                <div class="timer-display" id="timer-display">2:00</div>
+                <div id="mode-badge-hud" class="mode-badge">CLASSIC</div>
+                <div class="score-board" id="score-board"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.7rem;">
+                <div id="rage-wrap" style="display:none;">
+                    <span>RAGE</span>
+                    <div id="rage-bar-bg"><div id="rage-bar"></div></div>
+                </div>
+                <div class="it-label" id="it-display">IT: —</div>
+            </div>
+        </div>
+
+        <div id="arena-wrap">
+            <div id="arena">
+                <div id="arena-inner">
+                    <canvas id="heatmap-canvas"></canvas>
+                    <div class="glitch-banner" id="glitch-banner">GLITCH</div>
+                    <div id="kill-feed"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="glitch-log">// SYSTEM STABLE</div>
+        <div class="game-footer">
+            <button class="btn btn-muted" id="pause-btn" style="font-size:0.68rem;">PAUSE</button>
+            <button class="btn btn-danger" id="end-btn" style="font-size:0.68rem;">END</button>
+            <button class="btn btn-purp" id="emote-toggle-btn" style="font-size:0.68rem;">😜 TAUNT</button>
+            <button class="btn btn-muted" id="spectate-btn" style="font-size:0.68rem; display:none;">👻 SPECTATE</button>
+            <div id="combo-display"></div>
+        </div>
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div class="modal-bg" id="result-modal" style="display:none;">
+        <div class="modal" style="max-width:500px; overflow:hidden; position:relative;">
+            <!-- Winner celebration header -->
+            <div id="winner-celebration" style="text-align:center; padding:1rem 0 0.5rem; position:relative;">
+                <div id="winner-crown" style="font-size:2.8rem; line-height:1; margin-bottom:0.3rem;">👑</div>
+                <div id="winner-name-big" style="font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:900; letter-spacing:0.15em; margin-bottom:0.2rem;"></div>
+                <div id="winner-subtitle" style="font-size:0.65rem; letter-spacing:0.3em; color:var(--muted);"></div>
+                <div id="winner-hp-display" style="font-size:0.7rem; margin-top:0.4rem;"></div>
+            </div>
+            <div id="confetti-canvas-wrap" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;"></div>
+
+            <!-- Standings -->
+            <div class="winner-list" id="winner-list" style="margin-top:0.5rem;"></div>
+
+            <!-- Post-match awards -->
+            <div class="award-row" id="award-row"></div>
+
+            <!-- XP / Coins earned this match -->
+            <div id="match-rewards" style="display:flex; gap:0.5rem; justify-content:center; font-size:0.65rem; padding:0.4rem; background:var(--surface); border-radius:6px; border:1px solid var(--border); margin-top:0.3rem;"></div>
+
+            <!-- Match stats -->
+            <div id="match-stats" style="font-size:0.58rem; color:var(--muted); border-top:1px solid var(--border); padding-top:0.45rem; display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:center; text-align:center;"></div>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+                <button class="btn btn-accent" id="play-again-btn" style="flex:1;">▶ PLAY AGAIN</button>
+                <button class="btn btn-purp" id="watch-replay-btn" style="flex:1;">⏪ REPLAY</button>
+                <button class="btn btn-muted" id="back-lobby-btn" style="flex:1;">LOBBY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TUTORIAL MODAL -->
+    <div class="modal-bg" id="tutorial-modal" style="display:none;">
+        <div class="modal" style="max-height:80vh; overflow-y:auto;">
+            <h2>HOW TO PLAY</h2>
+            <div id="tutorial-content" style="font-size:0.62rem; line-height:1.8; color:var(--text);">
+                <!-- Tutorial content will be generated by JS -->
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <button class="btn btn-accent" id="close-tutorial-btn" style="flex:1;">GOT IT</button>
+                <button class="btn btn-muted" id="practice-btn" style="flex:1;">PRACTICE MODE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPLAY MODAL -->
+    <div class="modal-bg" id="replay-modal" style="display:none;">
+        <div class="modal" style="max-width:520px;">
+            <h2>⏪ REPLAY VIEWER</h2>
+            <div id="replay-info" style="font-size:0.6rem; color:var(--muted); text-align:center; margin-bottom:0.5rem;"></div>
+            <div id="replay-arena-mini" style="position:relative; width:100%; height:200px; background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:0.5rem;"></div>
+            <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+                <button class="btn btn-muted" id="replay-rewind-btn" style="font-size:0.65rem;">⏮ RESTART</button>
+                <button class="btn btn-accent" id="replay-play-btn" style="font-size:0.65rem; flex:1;">▶ PLAY</button>
+                <button class="btn btn-muted" id="replay-ff-btn" style="font-size:0.65rem;">⏩ FAST</button>
+            </div>
+            <div style="font-size:0.58rem; color:var(--muted); margin-bottom:0.5rem;">
+                <span>TIME: </span><span id="replay-time-display">0:00</span>
+                <span style="margin-left:1rem;">SPEED: </span><span id="replay-speed-display">1x</span>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-muted" id="close-replay-btn" style="flex:1; font-size:0.65rem;">CLOSE</button>
+                <button class="btn btn-warn" id="share-replay-btn" style="flex:1; font-size:0.65rem;">📋 COPY CODE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPECTATOR MODAL (shown when eliminated) -->
+    <div class="modal-bg" id="spectator-modal" style="display:none; pointer-events:none;">
+        <div style="position:fixed; top:8px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); border:1px solid var(--purp); border-radius:8px; padding:0.4rem 0.9rem; display:flex; gap:0.6rem; align-items:center; pointer-events:all; z-index:1001;">
+            <span style="font-size:0.6rem; color:var(--purp); font-family:Orbitron; letter-spacing:0.15em;">👻 SPECTATING</span>
+            <button class="btn btn-muted" id="spec-prev-btn" style="font-size:0.6rem; padding:2px 7px;">◀</button>
+            <span id="spec-target-name" style="font-size:0.6rem; color:var(--warn); min-width:60px; text-align:center;">FREE CAM</span>
+            <button class="btn btn-muted" id="spec-next-btn" style="font-size:0.6rem; padding:2px 7px;">▶</button>
+            <button class="btn btn-muted" id="close-spec-btn" style="font-size:0.6rem; padding:2px 7px;">✖</button>
+        </div>
+    </div>
+
+    <!-- MAP EDITOR MODAL -->
+    <div class="modal-bg" id="map-editor-modal" style="display:none;">
+        <div class="modal" style="max-width:680px; width:96%;">
+            <h2>🗺️ MAP EDITOR</h2>
+            <div style="font-size:0.6rem; color:var(--muted); margin-bottom:0.5rem;">Click/drag on the arena to place or remove obstacles and zones</div>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap;">
+                <button class="btn btn-accent map-tool-btn" data-tool="obstacle" style="font-size:0.62rem;">🧱 OBSTACLE</button>
+                <button class="btn btn-muted map-tool-btn" data-tool="zone-boost" style="font-size:0.62rem;">⚡ BOOST ZONE</button>
+                <button class="btn btn-muted map-tool-btn" data-tool="zone-slow" style="font-size:0.62rem;">🐢 SLOW ZONE</button>
+                <button class="btn btn-muted map-tool-btn" data-tool="zone-danger" style="font-size:0.62rem;">☠️ DANGER ZONE</button>
+                <button class="btn btn-danger map-tool-btn" data-tool="erase" style="font-size:0.62rem;">🗑️ ERASE</button>
+            </div>
+            <div id="map-editor-arena" style="position:relative; width:100%; height:260px; background:var(--surface); border:1px solid var(--accent); border-radius:6px; overflow:hidden; cursor:crosshair; margin-bottom:0.5rem;"></div>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="map-name-input" placeholder="MAP NAME" maxlength="20" style="width:140px; font-size:0.72rem;">
+                <button class="btn btn-warn" id="map-save-btn" style="font-size:0.65rem;">💾 SAVE</button>
+                <button class="btn btn-accent" id="map-use-btn" style="font-size:0.65rem; flex:1;">▶ USE THIS MAP</button>
+                <button class="btn btn-muted" id="close-map-editor-btn" style="font-size:0.65rem;">✖ CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MUSIC PLAYER -->
+    <div id="music-player" style="position:fixed; bottom:8px; right:12px; display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.7); border:1px solid var(--border); border-radius:6px; padding:4px 8px; z-index:200; font-size:0.58rem; color:var(--muted);">
+        <button id="music-toggle-btn" style="background:none;border:none;cursor:pointer;font-size:0.7rem;color:var(--muted);">🎵</button>
+        <span id="music-track-name">OFF</span>
+        <select id="music-track-select" style="background:transparent;border:none;color:var(--muted);font-size:0.55rem;cursor:pointer;outline:none;">
+            <option value="off">OFF</option>
+            <option value="chiptune">8-BIT CHIPTUNE</option>
+            <option value="synthwave">SYNTHWAVE</option>
+            <option value="glitch">GLITCH HOP</option>
+        </select>
+    </div>
+
+    <!-- VOICE LINE / EMOTE PANEL (in-game) -->
+    <div id="emote-panel" style="display:none; position:fixed; bottom:50px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); border:1px solid var(--purp); border-radius:8px; padding:0.4rem 0.6rem; z-index:500; display:none;">
+        <div style="font-size:0.55rem; color:var(--muted); margin-bottom:0.3rem; font-family:Orbitron;">TAUNTS — TAB to open · 1-6 to fire</div>
+        <div style="display:flex; gap:0.4rem;">
+            <button class="emote-btn" data-emote="0" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">😱</button>
+            <button class="emote-btn" data-emote="1" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">👑</button>
+            <button class="emote-btn" data-emote="2" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">🏃</button>
+            <button class="emote-btn" data-emote="3" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">💀</button>
+            <button class="emote-btn" data-emote="4" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">🎯</button>
+            <button class="emote-btn" data-emote="5" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;padding:3px 6px;font-size:0.9rem;">⚡</button>
+        </div>
+    </div>
+
+    <!-- EASTER EGG UNLOCK -->
+    <div id="easter-egg-modal" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.97); display:none; align-items:center; justify-content:center;">
+        <div style="text-align:center; font-family:Orbitron; padding:2rem;">
+            <div style="font-size:3rem; margin-bottom:1rem;">🐣</div>
+            <div style="font-size:1.2rem; color:var(--accent); letter-spacing:0.3em; margin-bottom:0.5rem;">DEVELOPER ROOM</div>
+            <div style="font-size:0.65rem; color:var(--warn); margin-bottom:1rem;">YOU FOUND THE SECRET!</div>
+            <div id="easter-egg-content" style="font-size:0.6rem; color:var(--muted); max-width:340px; line-height:1.8;"></div>
+            <button class="btn btn-accent" id="close-easter-egg-btn" style="margin-top:1.5rem;">ESCAPE DEV ROOM</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
