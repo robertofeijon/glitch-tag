@@ -119,7 +119,7 @@ export const MAP_PRESETS = {
 };
 
 export function createInitialPlayers(playerCount, options = {}) {
-  const { aiBots = 0, botPersonality = 'aggressive', aiSkills = {}, mode = 'classic' } = options;
+  const { aiBots = 0, botPersonality = 'aggressive', aiSkills = {}, mode = 'classic', playerNames = [], playerControls = [] } = options;
   const base = Array.from({ length: playerCount }, (_, i) => {
     const angle = (Math.PI * 2 * i) / playerCount;
     const radiusX = 250;
@@ -137,10 +137,14 @@ export function createInitialPlayers(playerCount, options = {}) {
     const archetypeId = archetypeIds[i % archetypeIds.length];
     const archetype = CHARACTER_TYPES[archetypeId];
     const isBot = i >= botStart;
+    const defaultName = isBot ? `BOT${i - botStart + 1}` : `P${i + 1}`;
+    const name = playerNames[i] || defaultName;
+    const controlsIndex = playerControls[i] !== undefined ? playerControls[i] : i % CONTROL_SCHEMES.length;
+    const controls = CONTROL_SCHEMES[controlsIndex];
 
     return {
       id: `p${i + 1}`,
-      name: isBot ? `BOT${i - botStart + 1}` : `P${i + 1}`,
+      name,
       x: base[i].x,
       y: base[i].y,
       vx: 0,
@@ -162,7 +166,7 @@ export function createInitialPlayers(playerCount, options = {}) {
       botPersonality,
       team: mode === 'team' ? (i % 2 === 0 ? 'alpha' : 'beta') : null,
       eliminated: false,
-      controls: CONTROL_SCHEMES[i % CONTROL_SCHEMES.length],
+      controls,
       archetypeId,
       maxHp: Math.round(100 * archetype.hpMul),
       shape: archetype.shape,

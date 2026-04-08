@@ -146,6 +146,8 @@ function makeInitialState(gameSettings, mapsCatalog) {
       support: gameSettings.aiSkillSupport ?? 60,
     },
     mode: gameSettings.mode,
+    playerNames: gameSettings.playerNames || [],
+    playerControls: gameSettings.playerControls || [],
   }).map((player) => ({
     ...player,
     maxHp: targetMaxHp,

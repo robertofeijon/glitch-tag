@@ -34,6 +34,8 @@ function loadGameSettings() {
     recoveryRequiresPriorIt: true,
     antiSnowball: false,
     antiSnowballBoost: 0.45,
+    playerNames: [],
+    playerControls: [],
   };
 
   try {

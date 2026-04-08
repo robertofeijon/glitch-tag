@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MODE_META } from '../constants/game';
+import { MODE_META, CONTROL_SCHEMES } from '../constants/game';
 
 export function GameSetup({ gameSettings, setGameSettings, activateAudio }) {
   const navigate = useNavigate();
@@ -163,6 +163,47 @@ export function GameSetup({ gameSettings, setGameSettings, activateAudio }) {
               <option value={320}>Fast</option>
             </select>
           </label>
+        </div>
+
+        <div className="menu-section-title">Player Setup</div>
+        <div className="player-setup-grid">
+          {Array.from({ length: effectiveTotal }, (_, i) => {
+            const isBot = i >= humanPlayers;
+            const defaultName = isBot ? `BOT${i - humanPlayers + 1}` : `P${i + 1}`;
+            const currentName = gameSettings.playerNames?.[i] || defaultName;
+            const currentControls = gameSettings.playerControls?.[i] ?? i % CONTROL_SCHEMES.length;
+            return (
+              <div key={i} className="player-setup-item">
+                <label>
+                  Player {i + 1} Name
+                  <input
+                    type="text"
+                    value={currentName}
+                    onChange={(e) => {
+                      const newNames = [...(gameSettings.playerNames || [])];
+                      newNames[i] = e.target.value;
+                      setGameSettings((prev) => ({ ...prev, playerNames: newNames }));
+                    }}
+                  />
+                </label>
+                <label>
+                  Controls
+                  <select
+                    value={currentControls}
+                    onChange={(e) => {
+                      const newControls = [...(gameSettings.playerControls || [])];
+                      newControls[i] = Number(e.target.value);
+                      setGameSettings((prev) => ({ ...prev, playerControls: newControls }));
+                    }}
+                  >
+                    {CONTROL_SCHEMES.map((scheme, idx) => (
+                      <option key={idx} value={idx}>{scheme.name}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            );
+          })}
         </div>
 
         <div className="launch-bar">

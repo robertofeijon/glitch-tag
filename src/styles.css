@@ -1717,3 +1717,52 @@ textarea {
   color: var(--primary);
   background: rgba(86, 191, 255, 0.1);
 }
+
+/* ===== PLAYER SETUP GRID ===== */
+.player-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.player-setup-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.player-setup-item label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.player-setup-item input,
+.player-setup-item select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.player-setup-item input:focus,
+.player-setup-item select:focus {
+  outline: none;
+  border-color: var(--ok);
+  box-shadow: 0 0 0 2px rgba(122, 255, 159, 0.2);
+}
+
+.player-setup-item select option {
+  background: #0b1e31;
+  color: #e6f2ff;
+}
