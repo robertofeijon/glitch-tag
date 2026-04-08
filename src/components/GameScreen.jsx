@@ -455,24 +455,6 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
           })}
         </div>
 
-        {(() => {
-          const localPlayerId = runtimeRules.localPlayerId || (view.players || []).find((p) => !p.isBot)?.id;
-          const localPlayer = view.players.find((p) => p.id === localPlayerId);
-          const justTagged = localPlayer?.justTaggedUntil && localPlayer.justTaggedUntil > view.simTime;
-          if (localPlayer && (localPlayer.isIt || justTagged)) {
-            return (
-              <div className="local-player-overlay">
-                <div className="overlay-content">
-                  <h1 className={localPlayer.isIt ? 'it-text' : 'tagged-text'}>
-                    {localPlayer.isIt ? (runtimeRules.badgeItText || 'YOU — IT') : (runtimeRules.badgeTaggedText || 'TAGGED')}
-                  </h1>
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-
         <div className="score-list">
           {view.players.map((player, index) => (
             <article key={player.id} className="score-item" style={{ borderColor: getPlayerColor(index) }}>
