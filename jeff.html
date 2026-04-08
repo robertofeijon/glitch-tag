@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Your Future — Software Engineering Careers | NUST</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c5cfc;
+    --accent2: #00d2ff;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #f0f0f8;
+    --muted: rgba(240,240,248,0.5);
+    --mono: 'Space Mono', monospace;
+    --display: 'Clash Display', sans-serif;
+    --body: 'Cabinet Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NUST LOGO BACKGROUND (subtle & integrated) ── */
+  .nust-bg-logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.04;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* For larger screens, make the logo slightly more visible but still subtle */
+  @media (min-width: 1024px) {
+    .nust-bg-logo {
+      opacity: 0.065;
+    }
+  }
+  
+  .nust-bg-logo svg {
+    width: min(90vw, 800px);
+    height: auto;
+    filter: blur(1px) drop-shadow(0 0 4px rgba(124,92,252,0.3));
+    transition: all 0.4s ease;
+  }
+  
+  /* Optional: add a soft glow effect behind the logo */
+  .nust-bg-logo::after {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(124,92,252,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    border-radius: 50%;
+  }
+
+  /* ── grid dots background (overlay on top of logo) ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(124,92,252,0.12) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── glowing orbs ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 400px; height: 400px; background: rgba(124,92,252,0.18); top: -100px; left: -100px; }
+  .orb2 { width: 300px; height: 300px; background: rgba(0,210,255,0.12); bottom: 100px; right: -80px; animation-delay: -4s; }
+  .orb3 { width: 200px; height: 200px; background: rgba(255,107,107,0.1); top: 50%; left: 50%; animation-delay: -8s; }
+
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(30px,20px) scale(1.05); }
+  }
+
+  /* ── content layer ── */
+  .page {
+    position: relative;
+    z-index: 2;  /* ensure content is above background logo */
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero h1 span.grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.25rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-family: var(--body);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,92,252,0.4); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 14px 32px;
+    border-radius: 100px;
+    font-family: var(--body);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+
+  /* ── scroll hint ── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .scroll-hint span { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.15em; }
+  .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--muted), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100%{opacity:0.3;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.2)} }
+
+  /* ── QUIZ SECTION ── */
+  .quiz-section {
+    padding: 6rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(124,92,252,0.12);
+    border: 1px solid rgba(124,92,252,0.25);
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+  }
+
+  /* quiz cards */
+  .quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    text-align: center;
+  }
+  .quiz-card:hover { border-color: var(--accent); background: var(--surface2); transform: translateY(-3px); }
+  .quiz-card.selected { border-color: var(--accent); background: rgba(124,92,252,0.15); }
+
+  .quiz-card .qicon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .quiz-card .qlabel {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  #quiz-result {
+    display: none;
+    background: var(--surface);
+    border: 1px solid rgba(124,92,252,0.4);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: left;
+    animation: fadeUp 0.5s forwards;
+  }
+
+  /* ── CAREERS GRID ── */
+  .careers-section {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+
+  .filter-btn {
+    font-family: var(--body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .careers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .career-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.75rem;
+    cursor: pointer;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .career-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--card-color, var(--accent)), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .career-card:hover {
+    border-color: var(--card-color, var(--accent));
+    transform: translateY(-4px);
+    background: var(--surface2);
+  }
+  .career-card:hover::before { opacity: 1; }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .card-emoji { font-size: 2rem; }
+
+  .card-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+
+  .card-title {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-salary {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+  }
+
+  /* ── hidden detail cards ── */
+  .career-card.hidden { display: none; }
+
+  /* ── DETAIL MODAL ── */
+  .modal-wrap {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-wrap.open { display: flex; }
+
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-box {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 2.5rem;
+    max-width: 560px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem; right: 1.25rem;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
+
+  .modal-emoji { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  .modal-title { font-family: var(--display); font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .modal-role { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.5rem; }
+
+  .modal-salary-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .salary-chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(0,210,255,0.1);
+    border: 1px solid rgba(0,210,255,0.25);
+    color: var(--accent2);
+  }
+
+  .modal-desc {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-skills-title {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .skills-list {
+    list-style: none;
+    margin-bottom: 1.75rem;
+  }
+  .skills-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+  }
+  .skills-list li::before {
+    content: '→';
+    font-family: var(--mono);
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .modal-day-in-life {
+    background: rgba(124,92,252,0.08);
+    border: 1px solid rgba(124,92,252,0.2);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .modal-day-in-life .dil-title {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .dil-items { display: flex; flex-direction: column; gap: 6px; }
+  .dil-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .dil-time { font-family: var(--mono); font-size: 11px; color: var(--accent2); min-width: 52px; }
+
+  .modal-cta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* ── SALARY CHART SECTION ── */
+  .salary-section {
+    padding: 6rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .bar-chart { margin-top: 2.5rem; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .bar-label {
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 140px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 10px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    width: 0;
+    transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+  }
+  .bar-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent2);
+    min-width: 60px;
+  }
+
+  /* ── PATH SECTION ── */
+  .path-section {
+    padding: 6rem 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .timeline {
+    position: relative;
+    margin-top: 3rem;
+    text-align: left;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  .tl-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .tl-item.visible { opacity: 1; transform: translateX(0); }
+
+  .tl-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-content { padding-top: 6px; }
+  .tl-year { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.15em; margin-bottom: 4px; }
+  .tl-title { font-family: var(--display); font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+  .tl-desc { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  /* ── FOOTER CTA ── */
+  .footer-cta {
+    padding: 6rem 2rem;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .footer-cta h2 {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .terminal {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .terminal .prompt { color: var(--accent2); }
+  .terminal .cmd { color: var(--text); }
+  .terminal .out { color: var(--accent4); }
+  .terminal .cursor { animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.7s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .careers-grid { grid-template-columns: 1fr; }
+    .quiz-grid { grid-template-columns: 1fr 1fr; }
+    .bar-label { min-width: 100px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NUST BACKGROUND LOGO (elegant watermark) -->
+<div class="nust-bg-logo">
+  <svg viewBox="0 0 800 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="800" height="300" fill="none"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Clash Display', 'Space Mono', monospace" font-size="48" font-weight="700" fill="currentColor" stroke="rgba(124,92,252,0.5)" stroke-width="0.8" letter-spacing="4">
+      <tspan x="50%" dy="-0.2em" fill="#7c5cfc" opacity="0.9">NAMIBIA UNIVERSITY</tspan>
+      <tspan x="50%" dy="1.2em" fill="#00d2ff" opacity="0.8" font-size="42">OF SCIENCE AND TECHNOLOGY</tspan>
+    </text>
+    <line x1="120" y1="180" x2="680" y2="180" stroke="url(#gradLine)" stroke-width="1.5" opacity="0.3"/>
+    <defs>
+      <linearGradient id="gradLine" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#7c5cfc" stop-opacity="0"/>
+        <stop offset="50%" stop-color="#7c5cfc" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#00d2ff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+</div>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="page">
+
+<!-- ── HERO ── -->
+<section class="hero" style="position:relative;">
+  <div class="hero-eyebrow">Career Fair 2024 · Software Engineering · Powered by NUST</div>
+  <h1>Build the<br><span class="grad">World</span> you<br>imagine.</h1>
+  <p class="hero-sub">Every app, website, game, and AI you've ever used was built by a software engineer. That could be you — starting right now, at NUST and beyond.</p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Find my path ↓</button>
+    <button class="btn-ghost" onclick="document.getElementById('careers').scrollIntoView({behavior:'smooth'})">Explore all careers</button>
+  </div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── QUIZ ── -->
+<section class="quiz-section reveal" id="quiz">
+  <div class="section-tag">// personality quiz</div>
+  <h2 class="section-title">What kind of builder are you?</h2>
+  <p class="section-sub">Pick what excites you most. We'll match you to a career path.</p>
+
+  <div class="quiz-grid" id="quiz-grid">
+    <div class="quiz-card" onclick="selectQuiz(this,'frontend')" data-match="frontend">
+      <span class="qicon">🎨</span>
+      <div class="qlabel">Making things look beautiful</div>
+    </div>
+    <div class="quiz-card" onclick="selectQuiz(this,'backend')" data-match="backend">
+      <span class="qicon">⚙️</span>
+      <div class="qlabel">Solving complex logic puzzles</div>
+    </div>
+    <div class="quiz-card" onclick="selectQuiz(this,'gamedev')" data-match="gamedev">
+      <span class="qicon">🎮</span>
+      <div class="qlabel">Creating games & interactive worlds</div>
+    </div>
+    <div class="quiz-card" onclick="selectQuiz(this,'ai')" data-match="ai">
+      <span class="qicon">🤖</span>
+      <div class="qlabel">Teaching machines to think</div>
+    </div>
+    <div class="quiz-card" onclick="selectQuiz(this,'security')" data-match="security">
+      <span class="qicon">🔐</span>
+      <div class="qlabel">Outsmarting hackers</div>
+    </div>
+    <div class="quiz-card" onclick="selectQuiz(this,'mobile')" data-match="mobile">
+      <span class="qicon">📱</span>
+      <div class="qlabel">Building apps people carry everywhere</div>
+    </div>
+  </div>
+
+  <div id="quiz-result"></div>
+</section>
+
+<!-- ── CAREERS GRID ── -->
+<section class="careers-section reveal" id="careers">
+  <div style="text-align:center; margin-bottom:3rem;">
+    <div class="section-tag">// all careers</div>
+    <h2 class="section-title">10 paths into tech</h2>
+    <p class="section-sub">Every one of these careers is in high demand. Click any card to go deep.</p>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+    <button class="filter-btn" onclick="filterCards('creative',this)">Creative</button>
+    <button class="filter-btn" onclick="filterCards('analytical',this)">Analytical</button>
+    <button class="filter-btn" onclick="filterCards('systems',this)">Systems</button>
+    <button class="filter-btn" onclick="filterCards('hottest',this)">🔥 Hottest</button>
+  </div>
+
+  <div class="careers-grid" id="careers-grid">
+  </div>
+</section>
+
+<!-- ── SALARY CHART ── -->
+<section class="salary-section reveal" id="salaries">
+  <div style="text-align:center; margin-bottom:0;">
+    <div class="section-tag">// compensation</div>
+    <h2 class="section-title">What do they earn?</h2>
+    <p class="section-sub" style="margin-bottom:0;">Average annual salary in the US. These grow significantly with experience.</p>
+  </div>
+  <div class="bar-chart" id="bar-chart"></div>
+</section>
+
+<!-- ── TIMELINE PATH ── -->
+<section class="path-section reveal" id="path">
+  <div class="section-tag">// your journey</div>
+  <h2 class="section-title">High school → dream job</h2>
+  <p class="section-sub">Here's what the path actually looks like.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot">📚</div>
+      <div class="tl-content">
+        <div class="tl-year">Right now · High School</div>
+        <div class="tl-title">Start learning to code</div>
+        <div class="tl-desc">Python on freeCodeCamp, Khan Academy, or Scratch. Build something small. Anything. A calculator, a quiz game, a website for your favourite band.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">🎓</div>
+      <div class="tl-content">
+        <div class="tl-year">Year 1–4 · University or Bootcamp</div>
+        <div class="tl-title">Get your foundation</div>
+        <div class="tl-desc">CS degree, a bootcamp, or self-teaching online — all three work. The key is building real projects and a portfolio of work you can show people.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">🌱</div>
+      <div class="tl-content">
+        <div class="tl-year">Age 20–22 · First Job</div>
+        <div class="tl-title">Junior Developer</div>
+        <div class="tl-desc">Your first real role. $60–95k. You'll feel out of your depth — that's normal. You learn faster on the job than anywhere else.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">⚡</div>
+      <div class="tl-content">
+        <div class="tl-year">Age 25–28 · Levelling Up</div>
+        <div class="tl-title">Mid-level / Senior Engineer</div>
+        <div class="tl-desc">Lead features, mentor others, make architectural calls. $120–180k. You can now pick the company, the stack, even the country you work in.</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot">🚀</div>
+      <div class="tl-content">
+        <div class="tl-year">Age 30+ · The Horizon</div>
+        <div class="tl-title">Principal Engineer · Manager · Founder</div>
+        <div class="tl-desc">Lead entire engineering orgs, build your own startup, or become a specialist worth $300k+. The ceiling is genuinely high in this field.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER CTA ── -->
+<section class="footer-cta reveal">
+  <h2>Your first line of code<br>is waiting.</h2>
+  <p style="color:var(--muted);font-size:1.1rem;margin-bottom:1.5rem;line-height:1.6;">Every engineer started exactly where you are right now. The only difference is they started.</p>
+
+  <div class="terminal">
+    <div><span class="prompt">$ </span><span class="cmd">python3 hello.py</span></div>
+    <div style="margin-top:8px;"><span class="out">Hello, World!</span></div>
+    <div style="margin-top:8px;"><span class="out">→ You just ran your first program.</span></div>
+    <div style="margin-top:8px;"><span class="out">→ That's how it always starts.</span></div>
+    <div style="margin-top:12px;"><span class="prompt">$ </span><span class="cursor">_</span></div>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:2rem;">
+    <button class="btn-primary" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})">Find my career path ↗</button>
+    <button class="btn-ghost" onclick="document.getElementById('careers').scrollIntoView({behavior:'smooth'})">Explore all roles</button>
+  </div>
+</section>
+
+</div><!-- .page -->
+
+<!-- ── MODAL ── -->
+<div class="modal-wrap" id="modal">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <span class="modal-emoji" id="m-emoji"></span>
+    <div class="modal-title" id="m-title"></div>
+    <div class="modal-role" id="m-role"></div>
+    <div class="modal-salary-row" id="m-salary"></div>
+    <p class="modal-desc" id="m-desc"></p>
+    <div class="modal-skills-title">Key skills to learn</div>
+    <ul class="skills-list" id="m-skills"></ul>
+    <div class="modal-day-in-life">
+      <div class="dil-title">// a day in the life</div>
+      <div class="dil-items" id="m-day"></div>
+    </div>
+    <div class="modal-cta">
+      <button class="btn-primary" id="m-learn" style="font-size:13px;padding:10px 22px;">Learn more about this path ↗</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Full careers data (same as original, just to keep all interactive pieces)
+const careers = [
+  { id:'frontend', emoji:'🖥️', title:'Frontend Developer', sub:'Build everything users see and touch', category:['creative'], color:'#7c5cfc', badge:'Visual', badgeBg:'rgba(124,92,252,0.15)', badgeColor:'#a58aff', salary:'$80k–$140k', salaryNum:110, role:'Specialization', hotness: false, desc:'Frontend developers craft the visual experience of the web — the buttons you tap, the animations that delight you, the layouts that just feel right. If you love design and want your work to be seen by millions, this is your path.', skills:['HTML, CSS & JavaScript','React, Vue, or Svelte','Responsive & accessible design','Browser performance optimization'], day:[{time:'9:00am', task:'Review designer mockups, plan implementation'},{time:'10:30am', task:'Build a new product page component in React'},{time:'2:00pm', task:'Fix a bug on mobile Safari (classic)'},{time:'4:00pm', task:'Ship a feature, watch it go live instantly'}], searchQuery:'How do I become a frontend developer?' },
+  { id:'backend', emoji:'⚙️', title:'Backend Developer', sub:'Power the engines behind every app', category:['analytical','systems'], color:'#00d2ff', badge:'Logical', badgeBg:'rgba(0,210,255,0.1)', badgeColor:'#00d2ff', salary:'$90k–$150k', salaryNum:120, role:'Specialization', desc:'Backend developers build the invisible machinery that makes apps work.', skills:['Python, Node.js, Java, or Go','SQL & NoSQL databases','REST APIs & system design','Cloud platforms (AWS, GCP)'], day:[{time:'9:00am', task:'Review overnight error logs'},{time:'10:00am', task:'Design a new API endpoint'},{time:'1:30pm', task:'Optimise a database query'},{time:'3:30pm', task:'Code review for a teammate'}], searchQuery:'What does a backend developer build?' },
+  { id:'fullstack', emoji:'🔀', title:'Full-Stack Developer', sub:'Master both front and back end', category:['creative','analytical'], color:'#ff6b6b', badge:'Versatile', badgeBg:'rgba(255,107,107,0.1)', badgeColor:'#ff8e8e', salary:'$90k–$155k', salaryNum:125, role:'Specialization', desc:'Full-stack devs can build an entire product alone.', skills:['Frontend: React + CSS','Backend: Node.js or Python','Databases & authentication','Deployment & DevOps basics'], day:[{time:'9:00am', task:'Fix frontend bug'},{time:'11:00am', task:'Build backend for new feature'},{time:'2:00pm', task:'Connect front to back'},{time:'4:00pm', task:'Deploy to production'}], searchQuery:'How to become a full-stack developer?' },
+  { id:'mobile', emoji:'📱', title:'Mobile Developer', sub:'Build apps that live in pockets', category:['creative'], color:'#ffd166', badge:'Apps', badgeBg:'rgba(255,209,102,0.1)', badgeColor:'#ffd166', salary:'$90k–$155k', salaryNum:120, role:'Specialization', desc:'Mobile devs build the apps on your phone.', skills:['Swift (iOS) or Kotlin (Android)','React Native or Flutter','App Store submission process','Touch UX & offline-first design'], day:[{time:'9:00am', task:'Test push notifications'},{time:'11:00am', task:'Fix crash reports'},{time:'2:00pm', task:'Implement smooth scroll'},{time:'4:30pm', task:'Submit app update'}], searchQuery:'What is mobile app development?' },
+  { id:'ai', emoji:'🤖', title:'AI / ML Engineer', sub:'Teach machines to see, hear, and reason', category:['analytical','hottest'], color:'#c77dff', badge:'🔥 Hottest field', badgeBg:'rgba(199,125,255,0.12)', badgeColor:'#c77dff', salary:'$120k–$200k+', salaryNum:165, role:'Specialization', hotness: true, desc:'AI engineers are building the most transformative technology in human history.', skills:['Python & data libraries','Machine learning (PyTorch, TensorFlow)','Statistics & linear algebra','Large language models'], day:[{time:'9:00am', task:'Train new model'},{time:'11:00am', task:'Analyse model underperformance'},{time:'2:00pm', task:'Experiment with architecture'},{time:'4:00pm', task:'Present results'}], searchQuery:'How do I become an AI engineer?' },
+  { id:'security', emoji:'🔒', title:'Cybersecurity Engineer', sub:'Protect systems from real-world attackers', category:['analytical','systems','hottest'], color:'#ff6b6b', badge:'High demand', badgeBg:'rgba(255,107,107,0.1)', badgeColor:'#ff8e8e', salary:'$100k–$165k', salaryNum:132, role:'Specialization', hotness: true, desc:'Every hospital, bank, government needs cybersecurity.', skills:['Networking fundamentals','Ethical hacking','Cryptography','Certifications: CompTIA Security+'], day:[{time:'9:00am', task:'Review security alerts'},{time:'10:30am', task:'Run penetration test'},{time:'2:00pm', task:'Write vulnerability report'},{time:'4:00pm', task:'Simulate phishing attack'}], searchQuery:'How to get started in cybersecurity?' },
+  { id:'devops', emoji:'🔧', title:'DevOps Engineer', sub:'Make software ship fast and run reliably', category:['systems'], color:'#00d2ff', badge:'Infrastructure', badgeBg:'rgba(0,210,255,0.08)', badgeColor:'#00d2ff', salary:'$100k–$160k', salaryNum:130, role:'Specialization', desc:'DevOps engineers automate deployments.', skills:['Linux & command line','Docker & Kubernetes','CI/CD pipelines','Cloud: AWS/Azure'], day:[{time:'9:00am', task:'Check dashboards'},{time:'10:00am', task:'Automate deployment'},{time:'1:30pm', task:'Debug incident'},{time:'3:00pm', task:'Set up auto-scaling'}], searchQuery:'What does a DevOps engineer do?' },
+  { id:'data', emoji:'📊', title:'Data Engineer', sub:'Build pipelines that move the world\'s data', category:['analytical','systems'], color:'#52b788', badge:'Data infrastructure', badgeBg:'rgba(82,183,136,0.1)', badgeColor:'#74c69d', salary:'$100k–$160k', salaryNum:130, role:'Specialization', desc:'Data engineers build pipelines to clean and organise massive data.', skills:['SQL & Python','Apache Spark & Kafka','Data warehouses','ETL design'], day:[{time:'9:00am', task:'Fix broken pipeline'},{time:'11:00am', task:'Build ingestion pipeline'},{time:'2:00pm', task:'Optimise SQL query'},{time:'4:00pm', task:'Work on schema design'}], searchQuery:'What is a data engineer?' },
+  { id:'gamedev', emoji:'🎮', title:'Game Developer', sub:'Build worlds people escape into', category:['creative'], color:'#f4a261', badge:'Creative', badgeBg:'rgba(244,162,97,0.1)', badgeColor:'#f4a261', salary:'$70k–$140k', salaryNum:105, role:'Specialization', desc:'Game developers build interactive worlds.', skills:['C++ or C#','Unity or Unreal Engine','3D math, physics','Game design principles'], day:[{time:'9:00am', task:'Playtest level'},{time:'11:00am', task:'Implement enemy AI'},{time:'2:00pm', task:'Integrate animations'},{time:'4:00pm', task:'Profile performance'}], searchQuery:'How do I become a game developer?' },
+  { id:'embedded', emoji:'🔌', title:'Embedded Systems Eng.', sub:'Write code that runs on physical hardware', category:['systems','analytical'], color:'#ffd166', badge:'Hardware + Software', badgeBg:'rgba(255,209,102,0.1)', badgeColor:'#ffd166', salary:'$90k–$150k', salaryNum:120, role:'Specialization', desc:'Embedded engineers write code for hardware.', skills:['C & C++','Microcontrollers (STM32)','Real-time OS','Electronics basics'], day:[{time:'9:00am', task:'Test firmware'},{time:'11:00am', task:'Debug sensor with scope'},{time:'2:00pm', task:'Optimise memory'},{time:'4:00pm', task:'Document spec'}], searchQuery:'What is embedded systems engineering?' },
+];
+
+const salaryData = [
+  {label:'AI / ML Engineer', val:165, color:'#c77dff'},{label:'Full-Stack Dev', val:125, color:'#ff6b6b'},{label:'Cybersecurity', val:132, color:'#ff8e8e'},{label:'Backend Dev', val:120, color:'#00d2ff'},{label:'Mobile Dev', val:120, color:'#ffd166'},{label:'DevOps', val:130, color:'#00d2ff'},{label:'Data Engineer', val:130, color:'#74c69d'},{label:'Frontend Dev', val:110, color:'#a58aff'},{label:'Embedded Sys.', val:120, color:'#ffd166'},{label:'Game Dev', val:105, color:'#f4a261'},
+];
+
+const quizMatches = {
+  frontend: { title:'Frontend Developer', desc:'You love making things beautiful. Frontend dev is your calling — turning design into living, breathing interfaces that millions of people interact with every day.', cta:'Explore Frontend' },
+  backend:  { title:'Backend Developer', desc:'You think in systems and logic. Backend engineering gives you the deep satisfaction of solving hard problems that most users never see — but always rely on.', cta:'Explore Backend' },
+  gamedev:  { title:'Game Developer', desc:'You want to create worlds. Game development combines creative storytelling, artistic vision, and serious engineering challenges.', cta:'Explore Game Dev' },
+  ai:       { title:'AI / ML Engineer', desc:'You\'re fascinated by intelligence itself. AI engineering is the most exciting frontier in tech right now.', cta:'Explore AI Engineering' },
+  security: { title:'Cybersecurity Engineer', desc:'You think like an adversary. That mindset is exactly what cybersecurity needs.', cta:'Explore Cybersecurity' },
+  mobile:   { title:'Mobile Developer', desc:'You want your work in people\'s hands — literally. Mobile apps are how billions experience the internet.', cta:'Explore Mobile Dev' },
+};
+
+function buildGrid() { const grid = document.getElementById('careers-grid'); careers.forEach(c => { const div = document.createElement('div'); div.className = 'career-card'; div.dataset.category = c.category.join(' '); div.style.setProperty('--card-color', c.color); div.innerHTML = `<div class="card-top"><span class="card-emoji">${c.emoji}</span><span class="card-badge" style="background:${c.badgeBg};color:${c.badgeColor};border-color:${c.color}33">${c.badge}</span></div><div class="card-title">${c.title}</div><div class="card-sub">${c.sub}</div><div class="card-salary">${c.salary} / year</div><div class="card-tags">${c.category.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`; div.onclick = () => openModal(c.id); grid.appendChild(div); }); }
+function buildSalaryChart() { const chart = document.getElementById('bar-chart'); const max = Math.max(...salaryData.map(d=>d.val)); salaryData.sort((a,b)=>b.val-a.val).forEach(d => { const pct = Math.round(d.val/max*100); const row = document.createElement('div'); row.className = 'bar-row'; row.innerHTML = `<div class="bar-label">${d.label}</div><div class="bar-track"><div class="bar-fill" data-pct="${pct}" style="background:${d.color}"></div></div><div class="bar-val">~$${d.val}k</div>`; chart.appendChild(row); }); }
+function animateBars() { document.querySelectorAll('.bar-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; }); }
+function filterCards(cat, btn) { document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.career-card').forEach(card => { if (cat === 'all' || card.dataset.category.includes(cat)) card.classList.remove('hidden'); else card.classList.add('hidden'); }); }
+function selectQuiz(el, match) { document.querySelectorAll('.quiz-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); const m = quizMatches[match]; const res = document.getElementById('quiz-result'); res.style.display = 'block'; res.innerHTML = `<div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;">// your match</div><div style="font-family:'Clash Display',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;">${m.title}</div><p style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:1.25rem;">${m.desc}</p><button class="btn-primary" style="font-size:13px;padding:10px 22px;" onclick="openModal('${match}')">${m.cta} →</button>`; res.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+function openModal(id) { const c = careers.find(x=>x.id===id); document.getElementById('m-emoji').textContent = c.emoji; document.getElementById('m-title').textContent = c.title; document.getElementById('m-role').textContent = c.role + ' · ' + (c.category.join(', ')); document.getElementById('m-salary').innerHTML = `<span class="salary-chip">${c.salary}/year</span>`; document.getElementById('m-desc').textContent = c.desc; document.getElementById('m-skills').innerHTML = c.skills.map(s=>`<li>${s}</li>`).join(''); document.getElementById('m-day').innerHTML = c.day.map(d=>`<div class="dil-item"><span class="dil-time">${d.time}</span><span>${d.task}</span></div>`).join(''); document.getElementById('m-learn').onclick = () => window.open(`https://www.google.com/search?q=${encodeURIComponent(c.searchQuery)}`, '_blank'); document.getElementById('modal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal() { document.getElementById('modal').classList.remove('open'); document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); if (entry.target.id === 'salaries') setTimeout(animateBars, 300); entry.target.querySelectorAll('.tl-item').forEach((item, i) => { setTimeout(()=>item.classList.add('visible'), i*150); }); } }); }, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+buildGrid(); buildSalaryChart();
+</script>
+</body>
+</html>

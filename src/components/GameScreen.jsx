@@ -395,6 +395,36 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
           <TeamHudMinimap players={view.players} objective={view.objective} />
         )}
 
+        {/* IT Status Display */}
+        {view.players && view.players.some(p => p.isIt) && (
+          <div className="it-status-badge">
+            <div className="it-status-content">
+              {view.players.find(p => p.isIt)?.name} <span className="it-label">is IT</span>
+            </div>
+          </div>
+        )}
+
+        {/* Tag Notifications */}
+        <div className="tag-notifications-container">
+          {view.feed
+            .filter((entry) => entry.text.includes('tagged'))
+            .slice(-3)
+            .map((entry, idx, filtered) => {
+              const age = view.simTime - entry.t;
+              const isVisible = age < 3.5;
+              return (
+                <div
+                  key={entry.id}
+                  className={`tag-notification ${isVisible ? 'visible' : 'fading'}`}
+                  style={{ animationDelay: `${idx * 0.15}s` }}
+                >
+                  <span className="tag-icon">★</span>
+                  <span>{entry.text}</span>
+                </div>
+              );
+            })}
+        </div>
+
         <div className="arena" ref={arenaRef}>
           {view.map?.zones.map((zone) => (
             <div
