@@ -255,15 +255,19 @@ function getClassicProfile(gameSettings) {
   return gameSettings.classicProfile || 'precision';
 }
 
-function getBotInput(bot, game, now, gameSettings) {
+function getBotInput(bot, game, now, gameSettings, runtimeOverrides = {}) {
   const skill = getSkillValue(bot);
+  // allow runtime adjustment of bot aggressiveness (0-100)
+  const aggressiveness = Number(runtimeOverrides.botAggressiveness ?? 50);
+  const skillBias = (aggressiveness - 50) * 0.6; // scale influence
+  const effectiveSkill = Math.max(0, Math.min(100, skill + skillBias));
   const teamProfile = getTeamProfile(gameSettings);
   const classicProfile = getClassicProfile(gameSettings);
   const teamBias = teamProfile === 'rush' ? -25 : teamProfile === 'botplay' ? 20 : 8;
   const classicBias = classicProfile === 'chaos' ? -20 : classicProfile === 'stalker' ? 22 : 10;
   const personalityLag = bot.botPersonality === 'aggressive' ? -20 : bot.botPersonality === 'evasive' ? 15 : 25;
-  const reactionInterval = Math.max(90, 320 - skill * 1.9 + personalityLag + teamBias + classicBias);
-  const aimNoise = Math.max(0.01, 0.28 - skill * 0.0022 + (bot.botPersonality === 'evasive' ? 0.03 : 0) - (classicProfile === 'precision' ? 0.02 : 0));
+  const reactionInterval = Math.max(60, 320 - effectiveSkill * 1.9 + personalityLag + teamBias + classicBias);
+  const aimNoise = Math.max(0.01, 0.28 - effectiveSkill * 0.0022 + (bot.botPersonality === 'evasive' ? 0.03 : 0) - (classicProfile === 'precision' ? 0.02 : 0));
   const needsThink = now >= (bot.botNextThink || 0) || !bot.botGoalX;
   let dx = bot.botGoalX || 0;
   let dy = bot.botGoalY || 0;
@@ -342,8 +346,18 @@ function getBotInput(bot, game, now, gameSettings) {
     if (!bot.isIt) {
       const escapeFrom = nearestThreat || nearestPlayer;
       if (escapeFrom) {
-        tx = bot.x + (bot.x - escapeFrom.x) * 1.15;
-        ty = bot.y + (bot.y - escapeFrom.y) * 1.15;
+        // Run away more decisively and sometimes dash if skilled
+        const fleeMul = 1.6 + (skill > 70 ? 0.25 : 0);
+        tx = bot.x + (bot.x - escapeFrom.x) * fleeMul;
+        ty = bot.y + (bot.y - escapeFrom.y) * fleeMul;
+        if (skill > 50 && Math.random() < 0.18) {
+          // attempt ability (dash) to escape
+          bot.botGoalAbility = true;
+        }
+      } else {
+        // No immediate threat — wander randomly to make movement less static
+        tx = bot.x + (Math.random() - 0.5) * 120;
+        ty = bot.y + (Math.random() - 0.5) * 80;
       }
     }
 
@@ -396,7 +410,13 @@ export function useGameEngine(gameSettings, mapsCatalog, rematchToken = 0, runti
   }, [isPaused]);
 
   useEffect(() => {
-    const onDown = (event) => keysRef.current.add(event.key.toLowerCase());
+    const onDown = (event) => {
+      // Prevent arrow keys from scrolling the page during play
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+        try { event.preventDefault(); } catch (e) { /* ignore */ }
+      }
+      keysRef.current.add(event.key.toLowerCase());
+    };
     const onUp = (event) => keysRef.current.delete(event.key.toLowerCase());
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
@@ -588,7 +608,7 @@ export function useGameEngine(gameSettings, mapsCatalog, rematchToken = 0, runti
           const archetype = getArchetypeById(player.archetypeId);
           const zoneEffect = getZoneEffect(player, game.map.zones || []);
 
-          const botInput = player.isBot ? getBotInput(player, game, now, gameSettings) : null;
+          const botInput = player.isBot ? getBotInput(player, game, now, gameSettings, runtimeOverridesRef.current) : null;
           const abilityPressed = player.isBot ? botInput.abilityPressed : keysRef.current.has(controls.ability);
           const justPressed = player.isBot
             ? abilityPressed
@@ -763,6 +783,9 @@ export function useGameEngine(gameSettings, mapsCatalog, rematchToken = 0, runti
             target.tagCd = liveSettings.mode === 'team' ? teamTagCd : liveSettings.mode === 'classic' ? classicTagCd : 0.35;
             target.shieldUntil = Math.max(target.shieldUntil || 0, now + 320);
             target.speedUntil = Math.max(target.speedUntil || 0, now + 900);
+            // mark a short 'justTagged' window for UI feedback
+            target.justTaggedUntil = now + 0.9;
+            it.justTaggedUntil = now + 0.9;
             pushFeed(game, `${it.name} tagged ${target.name}`);
           }
         }

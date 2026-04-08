@@ -73,6 +73,14 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
     powerups: gameSettings.powerups ?? true,
     antiSnowball: gameSettings.antiSnowball ?? false,
     antiSnowballBoost: gameSettings.antiSnowballBoost ?? 0.45,
+    // UI / tuning options
+    badgeItText: 'YOU — IT',
+    badgeTaggedText: 'TAGGED',
+    badgeLocalOnly: false,
+    animIntensity: 1.0, // scale 0.5 - 2
+    animSpeed: 1.0, // speed multiplier
+    botAggressiveness: 50, // 0-100
+    localPlayerId: null, // explicit local player selection
   }));
   const view = useGameEngine(gameSettings, mapsCatalog, rematchToken, runtimeRules, showMiniSettings);
   const arenaRef = useRef(null);
@@ -106,6 +114,14 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
 
   const sx = arenaSize.width / 640;
   const sy = arenaSize.height / 420;
+
+  // apply CSS vars for animation intensity/speed
+  useEffect(() => {
+    const node = arenaRef.current;
+    if (!node) return;
+    node.style.setProperty('--anim-scale', String(runtimeRules.animIntensity || 1));
+    node.style.setProperty('--anim-speed', String(runtimeRules.animSpeed || 1));
+  }, [runtimeRules.animIntensity, runtimeRules.animSpeed]);
 
   const currentTrackName = useMemo(() => {
     const all = [...SOUNDTRACKS, ...(settings.customTracks || [])];
@@ -306,6 +322,39 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
                 <option value="off">Off</option>
               </select>
             </label>
+            <label>
+              Badge IT Text
+              <input type="text" value={runtimeRules.badgeItText} onChange={(e) => setRuntimeRules((p) => ({ ...p, badgeItText: e.target.value }))} />
+            </label>
+            <label>
+              Badge Tagged Text
+              <input type="text" value={runtimeRules.badgeTaggedText} onChange={(e) => setRuntimeRules((p) => ({ ...p, badgeTaggedText: e.target.value }))} />
+            </label>
+            <label>
+              Badge Local Only
+              <input type="checkbox" checked={runtimeRules.badgeLocalOnly} onChange={(e) => setRuntimeRules((p) => ({ ...p, badgeLocalOnly: e.target.checked }))} />
+            </label>
+            <label>
+              Animation Intensity (0.5-2)
+              <input type="range" min="0.5" max="2" step="0.05" value={runtimeRules.animIntensity} onChange={(e) => setRuntimeRules((p) => ({ ...p, animIntensity: Number(e.target.value) }))} />
+            </label>
+            <label>
+              Animation Speed (0.5-2)
+              <input type="range" min="0.5" max="2" step="0.05" value={runtimeRules.animSpeed} onChange={(e) => setRuntimeRules((p) => ({ ...p, animSpeed: Number(e.target.value) }))} />
+            </label>
+            <label>
+              Bot Aggressiveness (0-100)
+              <input type="range" min="0" max="100" step="1" value={runtimeRules.botAggressiveness} onChange={(e) => setRuntimeRules((p) => ({ ...p, botAggressiveness: Number(e.target.value) }))} />
+            </label>
+            <label>
+              Local Player
+              <select value={runtimeRules.localPlayerId || ''} onChange={(e) => setRuntimeRules((p) => ({ ...p, localPlayerId: e.target.value || null }))}>
+                <option value="">Auto (first human)</option>
+                {view.players.map((player) => (
+                  <option key={player.id} value={player.id}>{player.name} ({player.isBot ? 'Bot' : 'Human'})</option>
+                ))}
+              </select>
+            </label>
           </div>
         )}
 
@@ -387,16 +436,42 @@ export function GameScreen({ settings, updateSettings, activateAudio, importTrac
               style={{ left: pickup.x * sx, top: pickup.y * sy }}
             />
           ))}
-          {view.players.map((player, index) => (
-            <div
-              key={player.id}
-              className={`player ${player.shape || 'circle'} ${player.isIt ? 'it' : ''} ${player.eliminated ? 'eliminated' : ''}`}
-              style={{ left: player.x * sx, top: player.y * sy, background: getPlayerColor(index) }}
-            >
-              <span>{player.name}</span>
-            </div>
-          ))}
+                  {view.players.map((player, index) => {
+                    const justTagged = player.justTaggedUntil && player.justTaggedUntil > view.simTime;
+                    const localPlayerId = runtimeRules.localPlayerId || (view.players || []).find((p) => !p.isBot)?.id;
+                    const showBadge = !runtimeRules.badgeLocalOnly || player.id === localPlayerId;
+            return (
+              <div
+                key={player.id}
+                className={`player ${player.shape || 'circle'} ${player.isIt ? 'it' : ''} ${justTagged ? 'just-tagged' : ''} ${player.eliminated ? 'eliminated' : ''} ${player.isBot ? 'bot' : 'human'}`}
+                style={{ left: player.x * sx, top: player.y * sy, background: getPlayerColor(index) }}
+              >
+                <span>{player.name}</span>
+                {!player.isBot && showBadge && (player.isIt || justTagged) && (
+                  <span className="you-indicator">{player.isIt ? runtimeRules.badgeItText || 'YOU — IT' : runtimeRules.badgeTaggedText || 'TAGGED'}</span>
+                )}
+              </div>
+            );
+          })}
         </div>
+
+        {(() => {
+          const localPlayerId = runtimeRules.localPlayerId || (view.players || []).find((p) => !p.isBot)?.id;
+          const localPlayer = view.players.find((p) => p.id === localPlayerId);
+          const justTagged = localPlayer?.justTaggedUntil && localPlayer.justTaggedUntil > view.simTime;
+          if (localPlayer && (localPlayer.isIt || justTagged)) {
+            return (
+              <div className="local-player-overlay">
+                <div className="overlay-content">
+                  <h1 className={localPlayer.isIt ? 'it-text' : 'tagged-text'}>
+                    {localPlayer.isIt ? (runtimeRules.badgeItText || 'YOU — IT') : (runtimeRules.badgeTaggedText || 'TAGGED')}
+                  </h1>
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         <div className="score-list">
           {view.players.map((player, index) => (
