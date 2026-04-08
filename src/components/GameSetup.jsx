@@ -32,8 +32,10 @@ export function GameSetup({ gameSettings, setGameSettings, activateAudio }) {
   };
 
   const totalPlayers = Number(gameSettings.playerCount) || 0;
-  const botPlayers = Math.min(Number(gameSettings.aiBots) || 0, Math.max(0, totalPlayers - 1));
-  const humanPlayers = Math.max(0, totalPlayers - botPlayers);
+  const isClassicPrecision = gameSettings.mode === 'classic' && (gameSettings.classicProfile || 'precision') === 'precision';
+  const effectiveTotal = isClassicPrecision ? 2 : totalPlayers;
+  const botPlayers = Math.min(Number(gameSettings.aiBots) || 0, Math.max(0, effectiveTotal - 1));
+  const humanPlayers = Math.max(0, effectiveTotal - botPlayers);
 
   return (
     <main className="layout">
@@ -60,7 +62,7 @@ export function GameSetup({ gameSettings, setGameSettings, activateAudio }) {
         </div>
 
         <div className="menu-section-title">Game Settings</div>
-        <p className="setup-counter">{totalPlayers} total / {botPlayers} bots / {humanPlayers} humans</p>
+        <p className="setup-counter">{effectiveTotal} total / {botPlayers} bots / {humanPlayers} humans {isClassicPrecision ? '(Precision Duel forces 2 players)' : ''}</p>
         <div className="menu-config simple-config">
           <label>
             Players
@@ -86,6 +88,48 @@ export function GameSetup({ gameSettings, setGameSettings, activateAudio }) {
             <select
               value={gameSettings.aiBots}
               onChange={(event) => setGameSettings((prev) => ({ ...prev, aiBots: Math.min(Number(event.target.value), prev.playerCount - 1) }))}
+            >
+              {Array.from({ length: Math.max(1, gameSettings.playerCount) }, (_, i) => i)
+                .filter((count) => count <= gameSettings.playerCount - 1)
+                .map((count) => (
+                  <option key={count} value={count}>{count}</option>
+                ))}
+            </select>
+          </label>
+
+          {gameSettings.mode === 'classic' && (
+            <label>
+              Classic Profile
+              <select
+                value={gameSettings.classicProfile || 'precision'}
+                onChange={(event) => setGameSettings((prev) => ({ ...prev, classicProfile: event.target.value }))}
+              >
+                <option value="precision">Precision Duel (2 players)</option>
+                <option value="chaos">Chaotic Pressure</option>
+                <option value="stalker">Positional Mindgame</option>
+              </select>
+            </label>
+          )}
+
+          {gameSettings.mode === 'team' && (
+            <label>
+              Team Profile
+              <select
+                value={gameSettings.teamProfile || 'defensive'}
+                onChange={(event) => setGameSettings((prev) => ({ ...prev, teamProfile: event.target.value }))}
+              >
+                <option value="defensive">Defensive Positional</option>
+                <option value="rush">Objective Rush</option>
+                <option value="botplay">Bot Teamplay</option>
+              </select>
+            </label>
+          )}
+
+          <label>
+            Duration
+            <select
+              value={gameSettings.duration}
+              onChange={(event) => setGameSettings((prev) => ({ ...prev, duration: Number(event.target.value) }))}
             >
               {Array.from({ length: Math.max(1, gameSettings.playerCount) }, (_, i) => i)
                 .filter((count) => count <= gameSettings.playerCount - 1)
